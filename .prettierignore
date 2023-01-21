@@ -1,0 +1,13 @@
+*.yml
+dist
+node_modules
+*.json
+*.html
+*.md
+*.graphql
+.prettierrc
+.prettierignore
+.babelrc
+*.less
+*.sass
+*.scss

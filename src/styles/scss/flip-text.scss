@@ -1,0 +1,104 @@
+$config: (
+        background: #fff,
+        text-color: #212529,
+        font-size: 18px,
+        letter-spacing: 1px,
+        animated: false,
+        nb-letters: 10,
+        animation-length: 4s,
+        mask-letters: ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
+);
+
+@function config($value) {
+  @return map-get($config, $value);
+}
+
+@function random-string($list) {
+  $result: null;
+  @for $i from 1 through length($list) {
+    $random: random(length($list));
+    $current: nth($list, $random);
+    $list: remove-nth($list, $random);
+    $result: $result#{$current};
+  }
+  @return $result;
+}
+
+@function remove-nth($list, $index) {
+  $result: ();
+  @for $i from 1 through length($list) {
+    @if $i != $index {
+      $result: append($result, nth($list, $i));
+    }
+  }
+  @return $result;
+}
+
+@mixin respond-to($breakpoint) {
+  @if type-of($breakpoint) == list {
+    @media (min-width: nth($breakpoint, 1)) and (max-width: nth($breakpoint, 2)) {
+      @content;
+    }
+  }
+  @else {
+    @media (max-width: $breakpoint) {
+      @content;
+    }
+  }
+}
+
+@function randomNum($min, $max) {
+  $rand: random();
+  $randomNum: $min + floor($rand * (($max - $min) + 1));
+
+  @return $randomNum;
+}
+
+// ----------------------------------
+
+.flip-text {
+  min-width: ceil(calc(config(font-size) / 2));
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  overflow: hidden;
+  padding: 0 ceil(calc(config(letter-spacing) / 2));
+  font-size: config(size);
+  text-transform: uppercase;
+  text-align: center;
+  color: inherit;
+  &:before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: inherit;
+    width: 100%;
+    word-break: break-all;
+    background-color: config(background);
+    animation-delay: 0.1s;
+    animation-fill-mode: forwards;
+  }
+}
+
+// ----------------------------------
+
+@for $i from 1 through config(nb-letters) {
+  $length: length(config(mask-letters));
+  $random: random($length);
+  $steps: $random - 1;
+  $offset: config(font-size) * $steps * -1;
+  .flip-text:nth-child(#{$i}):before {
+    content: "#{(random-string(config(mask-letters)))}";
+    transform: translateY($offset);
+    animation-name: letter#{$i};
+    animation-duration: randomNum(7, 12) * 0.1s;
+  }
+  @keyframes letter#{$i} {
+    from {
+      transform: translateY($offset);
+    }
+    to {
+      transform: translateY(config(font-size));
+    }
+  }
+}
